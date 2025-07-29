@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { FiMenu, FiX } from "react-icons/fi";
 import { papers } from "../data";
-
+import { IoCodeSlashSharp } from "react-icons/io5";
 export default function Sidebar() {
 	const [open, setOpen] = useState(false);
 	return (
@@ -37,7 +37,7 @@ export default function Sidebar() {
 					</Nav>
 				</Top>
 				<Footer>
-					Developed by{" "}
+					<IoCodeSlashSharp /> Developed by
 					<a href="https://saphirelabs.com" target="_blank" rel="noreferrer">
 						Saphire Labs
 					</a>
@@ -166,7 +166,9 @@ const Footer = styled.footer`
 	font-size: 0.75rem;
 	color: #586069;
 	border-top: 1px solid #e1e4e8;
-
+	align-items: center;
+	justify-content: space-evenly;
+	display: flex;
 	a {
 		color: #275646;
 		text-decoration: none;
