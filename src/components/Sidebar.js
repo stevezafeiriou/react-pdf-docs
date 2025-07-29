@@ -18,7 +18,9 @@ export default function Sidebar() {
 
 			<Drawer open={open}>
 				<Top>
-					<Logo src="/favicon.jpg" alt="Logo" />
+					<a href="https://saphirelabs.com">
+						<Logo src="/favicon.jpg" alt="Logo" />
+					</a>
 					<Nav>
 						<NavLink to="/" onClick={() => setOpen(false)}>
 							Documents
@@ -129,6 +131,10 @@ const Logo = styled.img`
 	height: 48px;
 	border-radius: 8px;
 	margin-bottom: 1rem;
+	transition: all 0.2s ease-in-out;
+	&:hover {
+		transform: scale(1.03);
+	}
 `;
 
 const Nav = styled.nav`
