@@ -19,7 +19,7 @@ Now with light/dark/system themes, lazy‑loaded skeletons, category pills for i
 ## Project Structure
 
 ```text
-my-pdf-viewer/
+react-pdf-viewer/
 ├── public/
 │   ├── manifesto.pdf
 │   ├── another-doc.pdf
@@ -43,8 +43,8 @@ my-pdf-viewer/
 ## Installation
 
 ```bash
-git clone https://github.com/your‑username/my‑pdf‑viewer.git
-cd my‑pdf‑viewer
+git clone https://github.com/your‑username/react-pdf-viewer.git
+cd react-pdf-viewer
 npm install
 npm start
 ```
