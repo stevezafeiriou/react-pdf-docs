@@ -1,5 +1,4 @@
-// src/components/PdfViewer.js
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -12,172 +11,177 @@ import {
 	FiDownload,
 } from "react-icons/fi";
 
-// Point to the ES‑module worker on UNPKG
+/* PDF.js worker (ES‑module build) */
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-const ViewerWrapper = styled.div`
+const BAR_H = 56;
+const DESKTOP_BP = 1500;
+const SIDEBAR_W = 240;
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 0.8;
+
+const Wrapper = styled.div`
 	height: 100%;
 	overflow-y: auto;
-	display: flex;
-	flex-direction: column;
+	background: ${({ theme }) => theme.colors.cardBg};
 `;
 
-const ControlsBar = styled.div`
-	position: sticky;
-	top: 0;
+const Bar = styled.div`
+	position: fixed;
+	top: 56;
 	left: 0;
+	height: ${BAR_H}px;
 	width: 100%;
-	z-index: 10;
-	background: #fff;
-	padding: 1rem 2rem;
-	border-bottom: 1px solid #e1e4e8;
+	background: ${({ theme }) => theme.colors.bg};
+	border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+	z-index: 100;
+	@media (min-width: ${DESKTOP_BP}px) {
+		left: ${SIDEBAR_W}px;
+		width: calc(100% - ${SIDEBAR_W}px);
+	}
+`;
+
+const BarInner = styled.div`
+	max-width: 960px;
+	height: 100%;
+	margin: 0 auto;
 	display: flex;
 	align-items: center;
-	gap: 1rem;
-
-	@media (min-width: 1500px) {
-		left: 240px;
-		width: calc(100% - 240px);
-	}
+	gap: 0.6rem;
+	padding: 0 0.5rem;
 `;
 
 const Title = styled.span`
+	flex: 0 1 240px;
+	min-width: 120px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-transform: capitalize;
+	white-space: nowrap;
 	font-size: 1rem;
 	font-weight: 600;
-	color: #24292e;
 `;
 
-const Btn = styled.button`
+const Icon = styled.button`
 	all: unset;
-	margin: 0 0.25rem;
+	flex-shrink: 0;
 	padding: 0.25rem;
+	border-radius: 4px;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
-	border-radius: 4px;
 	&:hover:not(:disabled) {
-		background: #f0f3f5;
+		background: ${({ theme }) => theme.colors.cardBg};
 	}
 	&:disabled {
-		opacity: 0.3;
+		opacity: 0.35;
 		cursor: default;
 	}
 `;
 
-// hide zoom buttons on mobile
-const ZoomBtn = styled(Btn)`
+const Zoom = styled(Icon)`
 	@media (max-width: 767px) {
 		display: none;
 	}
 `;
 
-const DownloadLink = styled.a`
-	all: unset;
-	margin-left: auto;
-	padding: 0.25rem;
-	display: flex;
-	align-items: center;
+const Count = styled.span`
+	flex-shrink: 0;
 	font-size: 0.9rem;
-	cursor: pointer;
-	color: #24292e;
-	border-radius: 4px;
-	&:hover {
-		background: #f0f3f5;
+`;
+
+const Pages = styled.div`
+	padding: ${BAR_H + 16}px 1rem 1rem;
+	@media (min-width: ${DESKTOP_BP}px) {
+		margin-left: ${SIDEBAR_W}px;
 	}
 `;
 
-const Indicator = styled.span`
-	font-size: 0.9rem;
-	color: #333;
-`;
-
-const DocArea = styled.div`
-	flex: 1;
-	background: #f6f8fa;
-	padding: 1rem;
-
-	@media (min-width: 1500px) {
-		margin-left: 240px;
-	}
-`;
-
-const PageWrapper = styled.div`
+const PageWrap = styled.div`
 	margin-bottom: 1rem;
 	display: flex;
 	justify-content: center;
 `;
 
+const Skeleton = styled.div`
+	background: #e0e0e0;
+	border-radius: 4px;
+`;
+
 const Footer = styled.div`
-	padding: 1rem 2rem;
-	font-size: 0.8rem;
-	color: #666;
+	padding: 1rem 0;
 	text-align: center;
+	font-size: 0.75rem;
+	color: ${({ theme }) => theme.colors.text};
 `;
 
 export default function PdfViewer({ file }) {
-	const MIN_SCALE = 0.5;
-	const MAX_SCALE = 0.8;
-
 	const [numPages, setNumPages] = useState(0);
 	const [pageNumber, setPageNumber] = useState(1);
 	const [scale, setScale] = useState(MIN_SCALE);
 	const [error, setError] = useState(null);
+	const wrapRef = useRef(null);
 
-	// derive display name
-	const rawName = file.split("/").pop() || "";
-	const baseName = rawName.replace(/\.pdf$/, "").replace(/-/g, " ");
-	const displayName = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+	/* pretty title */
+	const title = useMemo(() => {
+		const raw = file?.split("/").pop() || "";
+		return raw.replace(/\.pdf$/i, "").replace(/-/g, " ");
+	}, [file]);
 
-	const containerRef = useRef();
-
+	/* scroll active page into view */
 	useEffect(() => {
 		const el = document.getElementById(`pdf-page-${pageNumber}`);
-		if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+		el && el.scrollIntoView({ behavior: "smooth", block: "start" });
 	}, [pageNumber]);
 
 	return (
-		<ViewerWrapper>
-			<ControlsBar>
-				<Title>{displayName}</Title>
+		<Wrapper ref={wrapRef}>
+			{/* ---------- control bar ---------- */}
+			<Bar>
+				<BarInner>
+					<Title title={title}>{title}</Title>
 
-				<Btn
-					onClick={() => setPageNumber((n) => Math.max(n - 1, 1))}
-					disabled={pageNumber <= 1}
-				>
-					<FiChevronLeft size={18} />
-				</Btn>
+					<Icon
+						onClick={() => setPageNumber((n) => Math.max(1, n - 1))}
+						disabled={pageNumber <= 1}
+						aria-label="Previous page"
+					>
+						<FiChevronLeft />
+					</Icon>
+					<Count>
+						{pageNumber}/{numPages || "…"}
+					</Count>
+					<Icon
+						onClick={() => setPageNumber((n) => Math.min(numPages, n + 1))}
+						disabled={pageNumber >= numPages}
+						aria-label="Next page"
+					>
+						<FiChevronRight />
+					</Icon>
 
-				<Indicator>
-					{pageNumber} / {numPages}
-				</Indicator>
+					<Zoom
+						onClick={() => setScale((s) => Math.max(MIN_SCALE, s - 0.25))}
+						disabled={scale <= MIN_SCALE}
+						aria-label="Zoom out"
+					>
+						<FiZoomOut />
+					</Zoom>
+					<Zoom
+						onClick={() => setScale((s) => Math.min(MAX_SCALE, s + 0.25))}
+						disabled={scale >= MAX_SCALE}
+						aria-label="Zoom in"
+					>
+						<FiZoomIn />
+					</Zoom>
 
-				<Btn
-					onClick={() => setPageNumber((n) => Math.min(n + 1, numPages))}
-					disabled={pageNumber >= numPages}
-				>
-					<FiChevronRight size={18} />
-				</Btn>
+					<Icon as="a" href={file} download title="Download PDF">
+						<FiDownload />
+					</Icon>
+				</BarInner>
+			</Bar>
 
-				<ZoomBtn
-					onClick={() => setScale((s) => Math.max(MIN_SCALE, s - 0.25))}
-					disabled={scale <= MIN_SCALE}
-				>
-					<FiZoomOut size={18} />
-				</ZoomBtn>
-
-				<ZoomBtn
-					onClick={() => setScale((s) => Math.min(MAX_SCALE, s + 0.25))}
-					disabled={scale >= MAX_SCALE}
-				>
-					<FiZoomIn size={18} />
-				</ZoomBtn>
-
-				<DownloadLink href={file} download>
-					<FiDownload size={18} style={{ marginRight: "0.25rem" }} />
-				</DownloadLink>
-			</ControlsBar>
-
-			<DocArea ref={containerRef}>
+			{/* ---------- pages ---------- */}
+			<Pages>
 				{error ? (
 					<p style={{ color: "red" }}>{error.message}</p>
 				) : (
@@ -188,22 +192,36 @@ export default function PdfViewer({ file }) {
 							setPageNumber(1);
 						}}
 						onLoadError={setError}
-						loading={<p>Loading PDF…</p>}
+						loading={null}
+						noData={null}
 					>
-						{Array.from({ length: numPages }, (_, i) => (
-							<PageWrapper id={`pdf-page-${i + 1}`} key={i + 1}>
-								<Page
-									pageNumber={i + 1}
-									width={containerRef.current?.clientWidth * scale}
-								/>
-							</PageWrapper>
-						))}
+						{Array.from({ length: numPages }, (_, idx) => {
+							const w = wrapRef.current?.clientWidth
+								? wrapRef.current.clientWidth * scale
+								: undefined;
+							return (
+								<PageWrap id={`pdf-page-${idx + 1}`} key={idx + 1}>
+									<Page
+										pageNumber={idx + 1}
+										width={w}
+										loading={
+											<Skeleton
+												style={{
+													width: w || "80%",
+													height: w ? w * 1.3 : 200,
+												}}
+											/>
+										}
+									/>
+								</PageWrap>
+							);
+						})}
 					</Document>
 				)}
 				<Footer>
-					© {new Date().getFullYear()} Saphire. All rights reserved.
+					© {new Date().getFullYear()} Saphire. All Rights Reserved.
 				</Footer>
-			</DocArea>
-		</ViewerWrapper>
+			</Pages>
+		</Wrapper>
 	);
 }

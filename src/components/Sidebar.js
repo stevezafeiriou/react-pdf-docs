@@ -1,45 +1,189 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import styled from "styled-components";
-import { FiMenu, FiX } from "react-icons/fi";
-import { papers } from "../data";
+import styled, { css } from "styled-components";
+import { FiMenu, FiX, FiSun, FiMoon, FiMonitor } from "react-icons/fi";
 import { IoCodeSlashSharp } from "react-icons/io5";
+import { papers } from "../data";
+import { useThemeMode } from "../theme";
+
+const SIDEBAR_W = 240;
+const MOBILE_H = 56;
+const DESKTOP_BP = 1500;
+
+const MobileBar = styled.div`
+	position: fixed;
+	inset: 0 0 auto 0;
+	height: ${MOBILE_H}px;
+	padding: 0 1rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: ${({ theme }) => theme.colors.bg};
+	border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+	z-index: 120;
+	@media (min-width: ${DESKTOP_BP}px) {
+		display: none;
+	}
+`;
+
+const IconBtn = styled.button`
+	all: unset;
+	cursor: pointer;
+	padding: 0.5rem;
+	border-radius: 6px;
+	display: flex;
+
+	&:hover {
+		background: ${({ theme }) =>
+			theme.name === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"};
+	}
+`;
+
+const Overlay = styled.div`
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	opacity: ${({ visible }) => (visible ? 1 : 0)};
+	visibility: ${({ visible }) => (visible ? "visible" : "hidden")};
+	transition: opacity 0.25s ease;
+	z-index: 110;
+	@media (min-width: ${DESKTOP_BP}px) {
+		display: none;
+	}
+`;
+
+const Drawer = styled.aside`
+	position: fixed;
+	inset: 0 auto 0 0;
+	width: ${SIDEBAR_W}px;
+	background: ${({ theme }) => theme.colors.bg};
+	border-right: 1px solid ${({ theme }) => theme.colors.border};
+	display: flex;
+	flex-direction: column;
+	transform: translateX(${({ open }) => (open ? 0 : "-100%")});
+	transition: transform 0.25s ease;
+	z-index: 120;
+	@media (min-width: ${DESKTOP_BP}px) {
+		transform: none;
+	}
+`;
+
+const Content = styled.div`
+	padding: 1.75rem 1rem 1rem;
+	flex: 1 1 auto;
+	overflow-y: auto;
+`;
+
+const Logo = styled.img`
+	width: 64px;
+	height: 64px;
+	border-radius: 10px;
+	margin-bottom: 1.5rem;
+	transition: all 0.2s ease-in-out;
+	&:hover {
+		transform: scale(1.03);
+	}
+`;
+
+const PaletteRow = styled.div`
+	display: flex;
+	gap: 0.4rem;
+	margin-bottom: 1.5rem;
+`;
+const PaletteBtn = styled.button`
+	all: unset;
+	cursor: pointer;
+	padding: 0.35rem;
+	border-radius: 6px;
+	display: flex;
+	${({ $active, theme }) =>
+		$active &&
+		css`
+			background: ${theme.colors.accent}33;
+		`}
+	&:hover {
+		background: ${({ theme }) =>
+			theme.name === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"};
+	}
+`;
+
+const Nav = styled.nav`
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+`;
+
+const NavItem = styled(NavLink)`
+	padding: 0.55rem 1rem;
+	border-radius: 6px;
+	text-decoration: none;
+	font-size: 0.95rem;
+	color: ${({ theme }) => theme.colors.text};
+	&.active,
+	&:hover {
+		background: ${({ theme }) => theme.colors.cardBg};
+	}
+`;
+
+const Footer = styled.div`
+	padding: 1rem;
+	font-size: 0.8rem;
+	color: ${({ theme }) => theme.colors.text};
+	display: flex;
+	align-items: center;
+	a {
+		color: ${({ theme }) => theme.colors.accent};
+	}
+`;
+
 export default function Sidebar() {
 	const [open, setOpen] = useState(false);
 	return (
 		<>
+			{/* mobile top bar (hamburger + cycling theme btn) */}
 			<MobileBar>
-				<MenuButton onClick={() => setOpen((o) => !o)}>
+				<IconBtn onClick={() => setOpen((o) => !o)}>
 					{open ? <FiX size={24} /> : <FiMenu size={24} />}
-				</MenuButton>
+				</IconBtn>
 			</MobileBar>
 
 			<Overlay visible={open} onClick={() => setOpen(false)} />
 
+			{/* permanent / drawer sidebar */}
 			<Drawer open={open}>
-				<Top>
+				<Content>
 					<a href="https://saphirelabs.com">
-						<Logo src="/favicon.jpg" alt="Logo" />
+						<Logo src="/favicon.jpg" alt="logo" loading="lazy" />
 					</a>
+
+					{/* small palette */}
+					<ThemeButtons />
+
 					<Nav>
-						<NavLink to="/" onClick={() => setOpen(false)}>
+						<NavItem to="/" onClick={() => setOpen(false)}>
 							Documents
-						</NavLink>
+						</NavItem>
 						{papers.map((p) => (
-							<NavLink
+							<NavItem
 								key={p.file}
 								to={`/docs/${p.file}`}
 								onClick={() => setOpen(false)}
 							>
 								{p.title}
-							</NavLink>
+							</NavItem>
 						))}
 					</Nav>
-				</Top>
+				</Content>
+
 				<Footer>
-					<IoCodeSlashSharp /> Developed by
-					<a href="https://saphirelabs.com" target="_blank" rel="noreferrer">
-						Saphire Labs
+					<IoCodeSlashSharp />
+					&nbsp;Developed by&nbsp;
+					<a
+						href="https://github.com/stevezafeiriou/react-pdf-docs"
+						target="_blank"
+						rel="noreferrer"
+					>
+						Steve Zafeiriou
 					</a>
 				</Footer>
 			</Drawer>
@@ -47,133 +191,31 @@ export default function Sidebar() {
 	);
 }
 
-const MOBILE_BAR_HEIGHT = 56;
-
-const MobileBar = styled.div`
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: ${MOBILE_BAR_HEIGHT}px;
-	background: #fff;
-	border-bottom: 1px solid #e1e4e8;
-	display: flex;
-	align-items: center;
-	padding: 0 1rem;
-	z-index: 1000;
-
-	@media (min-width: 1500px) {
-		display: none;
-	}
-`;
-
-const MenuButton = styled.button`
-	all: unset;
-	cursor: pointer;
-`;
-
-const MobileLogo = styled.img`
-	width: 32px;
-	height: 32px;
-	margin-left: auto;
-`;
-
-const Overlay = styled.div`
-	display: ${({ visible }) => (visible ? "block" : "none")};
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.3);
-	z-index: 900;
-
-	@media (min-width: 1500px) {
-		display: none;
-	}
-`;
-
-const Drawer = styled.aside`
-	position: fixed;
-	top: ${MOBILE_BAR_HEIGHT}px;
-	left: ${({ open }) => (open ? "0" : "-240px")};
-	width: 240px;
-	height: calc(100vh - ${MOBILE_BAR_HEIGHT}px);
-	background: #fff;
-	border-right: 1px solid #e1e4e8;
-	display: flex;
-	flex-direction: column;
-	transition: left 0.25s ease;
-	z-index: 950;
-
-	@media (min-width: 1500px) {
-		top: 0;
-		left: 0;
-		height: 100vh;
-	}
-`;
-
-const Top = styled.div`
-	padding: 1rem;
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	overflow-y: auto;
-
-	/* hide scrollbar */
-	scrollbar-width: none;
-	-ms-overflow-style: none;
-	&::-webkit-scrollbar {
-		width: 0;
-		height: 0;
-	}
-`;
-
-const Logo = styled.img`
-	width: 48px;
-	height: 48px;
-	border-radius: 8px;
-	margin-bottom: 1rem;
-	transition: all 0.2s ease-in-out;
-	&:hover {
-		transform: scale(1.03);
-	}
-`;
-
-const Nav = styled.nav`
-	display: flex;
-	flex-direction: column;
-	font-size: 0.85rem;
-
-	a {
-		padding: 0.75rem 1rem;
-		margin-bottom: 0.25rem;
-		color: #24292e;
-		font-weight: 500;
-		text-decoration: none;
-		border-radius: 6px;
-		transition: background 0.2s;
-
-		&.active {
-			background: #f0f3f5;
-			color: #275646;
-		}
-		&:hover {
-			background: #f0f3f5;
-		}
-	}
-`;
-
-const Footer = styled.footer`
-	padding: 1rem;
-	font-size: 0.75rem;
-	color: #586069;
-	border-top: 1px solid #e1e4e8;
-	align-items: center;
-	justify-content: space-evenly;
-	display: flex;
-	a {
-		color: #275646;
-		text-decoration: none;
-		&:hover {
-			text-decoration: underline;
-		}
-	}
-`;
+function ThemeButtons() {
+	const { mode, setMode } = useThemeMode();
+	return (
+		<PaletteRow>
+			<PaletteBtn
+				$active={mode === "light"}
+				onClick={() => setMode("light")}
+				title="Light theme"
+			>
+				<FiSun size={18} />
+			</PaletteBtn>
+			<PaletteBtn
+				$active={mode === "dark"}
+				onClick={() => setMode("dark")}
+				title="Dark theme"
+			>
+				<FiMoon size={18} />
+			</PaletteBtn>
+			<PaletteBtn
+				$active={mode === "system"}
+				onClick={() => setMode("system")}
+				title="Follow system theme"
+			>
+				<FiMonitor size={18} />
+			</PaletteBtn>
+		</PaletteRow>
+	);
+}
