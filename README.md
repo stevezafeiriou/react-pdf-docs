@@ -43,7 +43,7 @@ react-pdf-docs/
 ## Installation
 
 ```bash
-git clone https://github.com/your‑username/react-pdf-docs.git
+git clone https://github.com/stevezafeiriou/react-pdf-docs
 cd react-pdf-docs
 npm install
 npm start
