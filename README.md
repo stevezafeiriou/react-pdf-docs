@@ -1,48 +1,43 @@
-# React PDF Viewer
+# React PDF Viewer & Library
 
-A simple, responsive, one‑page PDF reader built with React, React‑PDF, Styled‑Components and React Router. Display multiple PDFs from your `public/` folder, with a sidebar for navigation and sticky top controls for page navigation, zooming and downloading.
+A responsive **multi‑document PDF reader** built with React 18, React‑PDF, Styled‑Components, and React Router (v6).
+Now with light/dark/system themes, lazy‑loaded skeletons, category pills for instant filtering, and an in‑app comments panel.
 
-## Features
+## Key Features
 
-- **Multiple documents** via React Router (sidebar links to each PDF)
-- **Single‑page reader** showing one PDF at a time
-- **Sticky top controls** (always visible on desktop & mobile):
-  - Document title
-  - Previous / Next page
-  - Page indicator
-  - Zoom Out / Zoom In (hidden on small screens)
-  - Download button
-- **Responsive layout**:
-  - **Desktop**: 240px sidebar + sticky controls spanning remaining width
-  - **Mobile (<768px)**: sidebar collapses to a hamburger, controls bar sticks below 56px header, zoom buttons hidden
-- **Styled‑Components** for scoped CSS
-- **Global styles** in `GlobalStyle.js`—no separate theme file
+| Area                | Details                                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Documents**       | • Display any PDF placed in `/public/`<br>• Pages load lazily & render at the width of the viewport                           |
+| **Home Library**    | • Search bar<br>• Sort (A–Z / Recent)<br>• **Category pills** for 1‑click filters                                             |
+| **Viewer Controls** | • Sticky top bar: Prev / Next, page indicator, zoom (> 767 px), Download<br>• Filename truncates gracefully                   |
+| **Comments Panel**  | • 320 px panel on the right (≥ 1024 px)<br>• Mobile drawer toggled by 💬 icon<br>• Client‑side state; swap in your API easily |
+| **Theming**         | • Light / Dark / System toggle (sidebar palette)<br>• Global `<ThemeProvider>` + `GlobalStyle`                                |
+| **Loading UX**      | • Route‑level skeletons (`<Loading isHome \| isPdf />`)<br>• Per‑page grey placeholders while React‑PDF renders canvases      |
+| **Performance**     | • `React.lazy` + `Suspense` code‑splitting<br>• Native `loading="lazy"` for all thumbnails<br>• Worker‑powered PDF rendering  |
+| **Responsive**      | • 240 px sidebar on desktop; hamburger on mobile<br>• Controls bar auto‑offsets for sidebar & comments panel                  |
 
-## Project Structure
+## Project Structure
 
-```
-
+```text
 my-pdf-viewer/
 ├── public/
-│ ├── manifesto.pdf
-│ ├── another-doc.pdf
-│ └── favicon.jpg
+│   ├── manifesto.pdf
+│   ├── another-doc.pdf
+│   └── favicon.jpg
 ├── src/
-│ ├── components/
-│ │ ├── PdfViewer.js
-│ │ ├── Sidebar.js
-│ │ └── TopBar.js
-│ ├── pages/
-│ │ ├── Home.js
-│ │ └── DocumentPage.js
-│ ├── data.js
-│ ├── App.js
-│ ├── index.js
-│ └── GlobalStyle.js
-├── LICENSE
-├── package.json
+│   ├── components/
+│   │   ├── Loading.js          # route‑level skeletons
+│   │   ├── PdfViewer.js        # viewer + comments panel
+│   │   ├── Sidebar.js
+│   │   └── ThemeSwitch.js
+│   ├── pages/
+│   │   ├── Home.js
+│   │   └── DocumentPage.js
+│   ├── theme.js                # ThemeProvider + GlobalStyle
+│   ├── data.js                 # list of PDFs
+│   ├── App.js
+│   └── index.js
 └── README.md
-
 ```
 
 ## Installation
@@ -54,79 +49,62 @@ npm install
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Visit [http://localhost:3000](http://localhost:3000).
 
-## Usage
+## Adding Documents
 
-1. **Add** your PDFs to `public/` (e.g. `public/manifesto.pdf`).
+1. **Copy** your PDFs into `public/` (e.g. `public/design‑system.pdf`).
 
-2. **List** them in `src/data.js`:
+2. **Reference** them in `src/data.js`:
 
    ```js
-   // src/data.js
    export const papers = [
    	{
-   		file: "/manifesto.pdf",
-   		title: "Saphire Labs Manifesto",
-   		description: "Our guiding principles and research philosophy.",
+   		file: "design-system.pdf", // <- relative to /public
+   		title: "Design System",
+   		description: "Guidelines & assets.",
    		category: "Docs",
-   		date: "July 29, 2025",
-   		thumbnail: "/thumb-manifesto.jpg",
+   		date: "Aug 2025",
+   		thumbnail: "/thumb-design.jpg",
    	},
-   	// …more
+   	// ...
    ];
    ```
 
-3. **Sidebar** automatically picks up `papers` and builds links.
+3. Sidebar & Home update automatically—no extra routing required.
 
-4. **Routes** in `App.js` mount `Home` at `/` and `PdfViewer` at `/docs/:file`.
+## Themes
 
-5. **Global styles** in `GlobalStyle.js` already set your font, colors and reset.
+| Control                  | Location                                      | Persistence             |
+| ------------------------ | --------------------------------------------- | ----------------------- |
+| Palette buttons (☀ 🌙 🖥) | Sidebar header                                | Saved in `localStorage` |
+| System mode              | Follows `prefers‑color‑scheme` & live‑updates |                         |
 
-## Styling & Colors
+## Comments Panel
 
-All your palette is in `GlobalStyle.js` (no extra theme file). For example:
+- **Desktop (≥1024 px)** – Fixed on the right; pages get `margin‑right: 320px`.
+- **Mobile / Tablet** – Hidden by default; toggle with the 💬 icon in the top bar.
+- All comments live in local component state—swap in fetch/Socket logic as needed.
 
-```js
-// src/GlobalStyle.js
-import { createGlobalStyle } from "styled-components";
+## Responsive Breakpoints
 
-export default createGlobalStyle`
-  *, *::before, *::after { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f6f8fa;
-    color: #24292e;
-  }
-
-  a { text-decoration: none; color: inherit; }
-  button { font-family: inherit; cursor: pointer; background: none; border: none; }
-`;
-```
-
-## Responsive Behavior
-
-- **Desktop** (≥1500px)
-
-  - 240px fixed sidebar
-  - Controls bar: `position: sticky; top:0; left:240px; width:calc(100%-240px)`
-
-- **Mobile** (<768px)
-
-  - Sidebar hidden behind a hamburger icon
-  - Controls bar: `position: sticky; top:56px; left:0; width:100%`
-  - Zoom buttons hidden (`@media (max-width: 767px) { display: none }`)
+| Width           | Sidebar      | Comments      | Zoom buttons |
+| --------------- | ------------ | ------------- | ------------ |
+|  < 768 px       | Hamburger    | Drawer via 💬 | Hidden       |
+|  768 – 1023 px  | Hamburger    | Drawer via 💬 | Visible      |
+|  1024 – 1499 px | Hamburger    | Fixed 320 px  | Visible      |
+|  ≥ 1500 px      | Fixed 240 px | Fixed 320 px  | Visible      |
 
 ## Contributing
 
-1. Fork the repo
-2. Create a branch (`git checkout -b feature/foo`)
-3. Commit your changes (`git commit -am 'Add foo'`)
-4. Push to the branch (`git push origin feature/foo`)
-5. Open a pull request
+```text
+git checkout -b feature/my‑feature
+# code …
+git commit -m "Add amazing feature"
+git push origin feature/my‑feature
+# open PR
+```
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE)
+MIT — see [`LICENSE`](LICENSE).
