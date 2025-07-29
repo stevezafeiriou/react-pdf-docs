@@ -1,70 +1,132 @@
-# Getting Started with Create React App
+# React PDF Viewer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A simple, responsive, one‑page PDF reader built with React, React‑PDF, Styled‑Components and React Router. Display multiple PDFs from your `public/` folder, with a sidebar for navigation and sticky top controls for page navigation, zooming and downloading.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Multiple documents** via React Router (sidebar links to each PDF)
+- **Single‑page reader** showing one PDF at a time
+- **Sticky top controls** (always visible on desktop & mobile):
+  - Document title
+  - Previous / Next page
+  - Page indicator
+  - Zoom Out / Zoom In (hidden on small screens)
+  - Download button
+- **Responsive layout**:
+  - **Desktop**: 240px sidebar + sticky controls spanning remaining width
+  - **Mobile (<768px)**: sidebar collapses to a hamburger, controls bar sticks below 56px header, zoom buttons hidden
+- **Styled‑Components** for scoped CSS
+- **Global styles** in `GlobalStyle.js`—no separate theme file
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+my-pdf-viewer/
+├── public/
+│ ├── manifesto.pdf
+│ ├── another-doc.pdf
+│ └── favicon.jpg
+├── src/
+│ ├── components/
+│ │ ├── PdfViewer.js
+│ │ ├── Sidebar.js
+│ │ └── TopBar.js
+│ ├── pages/
+│ │ ├── Home.js
+│ │ └── DocumentPage.js
+│ ├── data.js
+│ ├── App.js
+│ ├── index.js
+│ └── GlobalStyle.js
+├── LICENSE
+├── package.json
+└── README.md
 
-### `npm test`
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Installation
 
-### `npm run build`
+```bash
+git clone https://github.com/your‑username/my‑pdf‑viewer.git
+cd my‑pdf‑viewer
+npm install
+npm start
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Open [http://localhost:3000](http://localhost:3000).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Usage
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Add** your PDFs to `public/` (e.g. `public/manifesto.pdf`).
 
-### `npm run eject`
+2. **List** them in `src/data.js`:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+   ```js
+   // src/data.js
+   export const papers = [
+   	{
+   		file: "/manifesto.pdf",
+   		title: "Saphire Labs Manifesto",
+   		description: "Our guiding principles and research philosophy.",
+   		category: "Docs",
+   		date: "July 29, 2025",
+   		thumbnail: "/thumb-manifesto.jpg",
+   	},
+   	// …more
+   ];
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. **Sidebar** automatically picks up `papers` and builds links.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+4. **Routes** in `App.js` mount `Home` at `/` and `PdfViewer` at `/docs/:file`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+5. **Global styles** in `GlobalStyle.js` already set your font, colors and reset.
 
-## Learn More
+## Styling & Colors
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+All your palette is in `GlobalStyle.js` (no extra theme file). For example:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```js
+// src/GlobalStyle.js
+import { createGlobalStyle } from "styled-components";
 
-### Code Splitting
+export default createGlobalStyle`
+  *, *::before, *::after { box-sizing: border-box; }
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f6f8fa;
+    color: #24292e;
+  }
 
-### Analyzing the Bundle Size
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; cursor: pointer; background: none; border: none; }
+`;
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Responsive Behavior
 
-### Making a Progressive Web App
+- **Desktop** (≥1500px)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+  - 240px fixed sidebar
+  - Controls bar: `position: sticky; top:0; left:240px; width:calc(100%-240px)`
 
-### Advanced Configuration
+- **Mobile** (<768px)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+  - Sidebar hidden behind a hamburger icon
+  - Controls bar: `position: sticky; top:56px; left:0; width:100%`
+  - Zoom buttons hidden (`@media (max-width: 767px) { display: none }`)
 
-### Deployment
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+1. Fork the repo
+2. Create a branch (`git checkout -b feature/foo`)
+3. Commit your changes (`git commit -am 'Add foo'`)
+4. Push to the branch (`git push origin feature/foo`)
+5. Open a pull request
 
-### `npm run build` fails to minify
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the [MIT License](LICENSE)
