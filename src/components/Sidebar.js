@@ -111,6 +111,11 @@ const Nav = styled.nav`
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
+
+	.border-down {
+		border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+		margin: 10px 0;
+	}
 `;
 
 const NavItem = styled(NavLink)`
@@ -161,8 +166,9 @@ export default function Sidebar() {
 
 					<Nav>
 						<NavItem to="/" onClick={() => setOpen(false)}>
-							Documents
+							All Documents
 						</NavItem>
+						<div className="border-down" />
 						{papers.map((p) => (
 							<NavItem
 								key={p.file}

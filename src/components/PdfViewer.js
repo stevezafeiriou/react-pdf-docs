@@ -91,7 +91,8 @@ const Count = styled.span`
 `;
 
 const Pages = styled.div`
-	padding: ${BAR_H + 16}px 1rem 1rem;
+	padding: ${BAR_H + 6}px 1rem 1rem;
+
 	@media (min-width: ${DESKTOP_BP}px) {
 		margin-left: ${SIDEBAR_W}px;
 	}

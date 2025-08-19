@@ -14,7 +14,7 @@ const lightTheme = {
 		text: "#24292e",
 		cardBg: "#f6f8fa",
 		border: "#e1e4e8",
-		accent: "#1f6feb",
+		accent: "#26A73B",
 	},
 };
 
@@ -25,7 +25,7 @@ const darkTheme = {
 		text: "#c9d1d9",
 		cardBg: "#161b22",
 		border: "#30363d",
-		accent: "#58a6ff",
+		accent: "#59f673ff",
 	},
 };
 
