@@ -23,6 +23,22 @@ export const papers = [
 		date: "Aug 19, 2025",
 		thumbnail: "/resume-thumbnail.jpg",
 	},
+	{
+		file: "prints-catalog.pdf",
+		title: "Prints Catalog",
+		description: `Through generative algorithms, sensors, and interactive systems, his work transforms real-time data and human presence into evolving visual forms. This document outlines available printed artworks and pricing.`,
+		category: "Brand",
+		date: "Nov 3, 2025",
+		thumbnail: "/catalog-thumbnail.jpg",
+	},
+	{
+		file: "services.pdf",
+		title: "Services",
+		description: `Over the past two years, Saphire Labs has expanded its artistic and commercial activity through limited-edition works and interactive projects that combine advanced computational methods with museum-grade production.`,
+		category: "Brand",
+		date: "Nov 3, 2025",
+		thumbnail: "/services-thumbnail.jpg",
+	},
 
 	// …add more papers here…
 ];
