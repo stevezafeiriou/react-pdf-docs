@@ -16,12 +16,12 @@ export const papers = [
 		thumbnail: "/list-of-works-thumbnail.jpg",
 	},
 	{
-		file: "resume.pdf",
-		title: "Resume",
+		file: "cv.pdf",
+		title: "Resume (CV)",
 		description: `Steve Zafeiriou’s resume, including experience and skills, exhibitions, workshops, stage performances, articles and publications and more.`,
 		category: "PERSONAL BRAND",
 		date: "Nov 09, 2025",
-		thumbnail: "/resume-thumbnail.jpg",
+		thumbnail: "/cv-thumbnail.jpg",
 	},
 	{
 		file: "prints-catalog.pdf",
