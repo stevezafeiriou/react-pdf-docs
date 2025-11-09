@@ -21,3 +21,14 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+/public/catalog-thumbnail.jpg
+/public/prints-catalog.pdf
+/public/list-of-works_v3.8.pdf
+/public/list-of-works-thumbnail.jpg
+/public/manifesto-thumbnail.jpg
+/public/manifesto.pdf
+/public/prints-catalog.pdf
+/public/resume-thumbnail.jpg
+/public/resume.pdf
+/public/services.pdf
