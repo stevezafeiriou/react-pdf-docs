@@ -8,7 +8,7 @@ export const papers = [
 		thumbnail: "/manifesto-thumbnail.jpg",
 	},
 	{
-		file: "list-of-works_v3.8.pdf",
+		file: "list_of_works_steve_zafeiriou.pdf",
 		title: "List of Works",
 		description: `Steve Zafeiriou’s installations focus on the interaction between technology and human behavior.  These responsive environments integrate data-driven systems that react to the presence and /or actions of viewers, illustrating the reciprocal influence between humans and digital systems.`,
 		category: "PERSONAL BRAND",
